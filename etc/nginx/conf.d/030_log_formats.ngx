@@ -1,0 +1,27 @@
+# Defines various log formats
+# Access Logs
+
+log_format access_json '{'
+    '"environment":     "production", '
+    '"type":            "event", '
+    '"format":          "json", '
+    '"time":            "$time_local", '
+    '"remote_addr":     "$remote_addr", '
+    '"request_time":    "$request_time", '
+    '"code":            "$status", '
+    '"file":            "$request_uri", '
+    '"level":           "information", '
+    '"payload":         "$request", '
+    '"package":         "nginx", '
+    '"request_method":  "$request_method", '
+    '"http_user_agent": "$http_user_agent", '
+    '"service":         "$host", '
+    '"user_id":         "$user_id", '
+    '"version":         "1.0.2"'
+    '}';
+
+log_format access_text '$remote_addr - $remote_user [$time_local] "$request" '
+    '$status $body_bytes_sent "$http_referer" '
+    '"$http_user_agent" "$http_x_forwarded_for"';
+
+# Page Load Metrics

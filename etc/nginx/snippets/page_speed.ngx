@@ -1,0 +1,83 @@
+pagespeed on;
+
+pagespeed FileCachePath /var/nginx/page_speed;
+
+# Record page load
+pagespeed EnableFilters add_instrumentation;
+pagespeed BeaconUrl "/ps/beacon";
+
+# Ensure requests for pagespeed optimized resources go to the pagespeed handler
+# and no extraneous headers get set.
+location ~ "\.pagespeed\.([a-z]\.)?[a-z]{2}\.[^.]{10}\.[^.]+" {
+  add_header "" "";
+}
+
+# Compress JavaScript
+pagespeed EnableFilters rewrite_javascript;
+pagespeed UseExperimentalJsMinifier on;
+
+# Enable canonical JavaScript URLs
+pagespeed EnableFilters canonicalize_javascript_libraries;
+
+# Create cache-busting resource URLs
+pagespeed EnableFilters extend_cache;
+
+# Defer the loading of JavaScript
+pagespeed EnableFilters defer_javascript;
+
+# Remove redundant HTML attribute values
+pagespeed EnableFilters elide_attributes;
+
+# Enable whitespace filtering
+pagespeed EnableFilters collapse_whitespace;
+
+# Enable the meta tags filter
+pagespeed EnableFilters convert_meta_tags;
+
+# Remove duplicate image references
+pagespeed EnableFilters dedup_inlined_images;
+
+# Resize images on mobile
+pagespeed EnableFilters resize_mobile_images;
+
+# Lazy Load images
+pagespeed EnableFilters lazyload_images;
+pagespeed LazyloadImagesBlankUrl "http://www.gstatic.com/psa/static/1.gif";
+
+# Rewrite images to optimized versions
+pagespeed EnableFilters rewrite_images;
+
+# Sprint Images
+pagespeed EnableFilters rewrite_css,sprite_images;
+
+# Move the CSS references into the head
+pagespeed EnableFilters move_css_to_head;
+
+# Prioritize the critical CSS
+pagespeed EnableFilters prioritize_critical_css;
+
+# Rewrite CSS
+pagespeed EnableFilters rewrite_css;
+pagespeed EnableFilters fallback_rewrite_css_urls;
+pagespeed EnableFilters rewrite_style_attributes;
+pagespeed EnableFilters rewrite_style_attributes_with_url;
+
+# Remove comments
+pagespeed EnableFilters remove_comments;
+
+# Remove redundant quotes
+pagespeed EnableFilters remove_quotes;
+
+# Enable DNS prefetching
+pagespeed EnableFilters insert_dns_prefetch;
+
+location ~ "^/ps/beacon$" { }
+
+# Lowercase HTML Entities
+pagespeed LowercaseHtmlNames on;
+
+# Trim URLs
+pagespeed EnableFilters trim_urls;
+
+# Inline preview images
+pagespeed EnableFilters inline_preview_images;

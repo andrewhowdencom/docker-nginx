@@ -1,0 +1,37 @@
+# General Gzip settings
+gzip            on;
+
+# Disable compression for browsers that do not support it
+gzip_disable    "MSIE [1-6]\.(?!.*SV1)";
+
+# Enable the "Vary: Accept-Encoding" response header
+gzip_vary       on;
+
+# Files smaller than 256 length tend to produce larger gzipped files than the initial file
+gzip_min_length 256;
+
+# Enable compression for proxied requests
+gzip_proxied    any;
+
+# Define the MIME types that will be compressed
+gzip_types
+    application/atom+xml
+    application/javascript
+    application/json
+    application/ld+json
+    application/manifest+json
+    application/rdf+xml
+    application/rss+xml
+    application/schema+json
+    application/vnd.geo+json
+    application/vnd.ms-fontobject
+    application/x-font-ttf
+    application/x-javascript
+    application/x-web-app-manifest+json
+    application/xhtml+xml
+    application/xml
+    font/eot
+    text/css
+    text/javascript
+    text/plain
+    text/xml;

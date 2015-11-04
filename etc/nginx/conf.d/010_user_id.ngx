@@ -1,0 +1,4 @@
+# Enable a user ID module
+userid         on;
+userid_name    user_id;
+userid_expires max;

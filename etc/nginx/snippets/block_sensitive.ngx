@@ -1,0 +1,8 @@
+# List of files that should be dropped (in order)
+# .*
+
+location ~ (\..*$|log\/|etc\/|composer\.*|scss|sass) {
+    access_log off;
+    log_not_found off;
+    return 404;
+}

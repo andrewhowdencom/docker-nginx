@@ -1,0 +1,13 @@
+# Map the dot point resolution (DPR) to a consistent value
+map $http_ch_dpr $dpr {
+    default: "1.0";
+    ~1\.[01234] "1.0";
+    ~1\.[56789] "1.5";
+    ~2\.[0123456789] "2.0";
+}
+
+# Map the user ID (whether just set or received) to a single variable
+map $uid_set $user_id {
+        default $uid_set;
+        ""      $uid_got;
+}

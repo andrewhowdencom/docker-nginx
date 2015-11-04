@@ -1,0 +1,19 @@
+# Serve the appropriate image asset depending on the DPR, with cache headers
+location ~* (?<folder>\/.*)\/(?<name>[A-z0-9_%-.]*)\.(?<ext>gif|jpe?g|png|svg|webp|bmp|tiff)$ {
+    # Add the cache control headers
+    add_header Pragma public;
+    add_header Cache-Control "public, max-age=35636000";
+
+    # Add the headers to signal DPR response
+    add_header DPR $dpr;
+    add_header vary CH-DPR;
+
+    try_files $folder/$name-$dpr.$ext $uri =404;
+}
+
+# Set the cache control headers for static (non image) assets
+location ~* \.(?:ico|css|js)$ {
+    expires 365d;
+    add_header Pragma public;
+    add_header Cache-Control "public, max-age=31536000";
+}
