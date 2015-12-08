@@ -8,7 +8,7 @@ MAINTAINER littleman.co <support@littleman.co>
 RUN apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62
 RUN echo "deb http://nginx.org/packages/mainline/debian/ jessie nginx" >> /etc/apt/sources.list
 
-ENV NGINX_VERSION 1.9.6-1~jessie
+ENV NGINX_VERSION 1.9.7-1~jessie
 
 RUN apt-get update && \
     apt-get install -y ca-certificates nginx=${NGINX_VERSION} && \
@@ -30,4 +30,4 @@ VOLUME ["/etc/nginx/sites-enabled/", "/etc/ssl/", "/etc/nginx/conf.d/", "/var/lo
 EXPOSE 80 443
 
 # Run with custom configuration path
-CMD ["nginx", "-c", "/etc/nginx/nginx.ngx", "-g", "daemon off;"]
+CMD ["nginx", "-g", "daemon off;"]
