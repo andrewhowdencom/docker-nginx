@@ -1,8 +1,6 @@
 # Usage: As part of a kubernetes pod
 # Much of this file was derived from https://github.com/dockerfile/nginx/blob/master/Dockerfile
-
-FROM debian:jessie
-
+FROM debian:8.2
 MAINTAINER littleman.co <support@littleman.co> 
 
 RUN apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62
@@ -27,9 +25,8 @@ ADD etc/nginx /etc/nginx
 # Bind to the host file system for better performance. See https://github.com/nginxinc/docker-nginx/issues/19
 VOLUME ["/var/cache/nginx"]
 
-VOLUME ["/etc/nginx/sites-enabled/", "/etc/ssl/", "/etc/nginx/conf.d/", "/var/log/nginx/", "/var/www/"]
+VOLUME ["/etc/ssl/", "/etc/nginx/conf.d/"]
 
 EXPOSE 80 443
 
-# Run with custom configuration path
 CMD ["nginx", "-g", "daemon off;"]
