@@ -1,32 +1,73 @@
 # Usage: As part of a kubernetes pod
-# Much of this file was derived from https://github.com/dockerfile/nginx/blob/master/Dockerfile
-FROM debian:8.2
+# Inspired by 
+# - https://github.com/sickp/docker-alpine-nginx/blob/master/versions/1.9.10-k8s/Dockerfile
+# - https://github.com/docker-library/redis/commit/18e13f767bd396c53aa1f0071b218816110060ac
+#
+# Notably, 
+# - The user is running as www-data
+# - Some NGINX modules aren't compiled (mail, mail-ssl, dav, flv)
+# - It's not running on alpine-kubernetes 
+
+FROM alpine:3.3
 MAINTAINER littleman.co <support@littleman.co> 
 
-RUN apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62
-RUN echo "deb http://nginx.org/packages/mainline/debian/ jessie nginx" >> /etc/apt/sources.list
-
-ENV NGINX_VERSION 1.9.9-1~jessie
-
-RUN apt-get update && \
-    apt-get install -y ca-certificates nginx=${NGINX_VERSION} && \
-    rm -rf /var/lib/apt/lists/*
+RUN \
+  NGINX_VERSION="1.9.10" && \
+  BUILD_PKGS="build-base linux-headers openssl-dev pcre-dev wget zlib-dev" && \
+  RUNTIME_PKGS="ca-certificates openssl pcre zlib" && \
+  apk --update add ${BUILD_PKGS} ${RUNTIME_PKGS} && \
+  cd /tmp && \
+  wget http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz && \
+  tar xzf nginx-${NGINX_VERSION}.tar.gz && \
+  cd /tmp/nginx-${NGINX_VERSION} && \
+  ./configure \
+    --prefix=/etc/nginx \
+    --sbin-path=/usr/sbin/nginx \
+    --conf-path=/etc/nginx/nginx.conf \
+    --error-log-path=/var/log/nginx/error.log \
+    --http-log-path=/var/log/nginx/access.log \
+    --pid-path=/var/run/nginx.pid \
+    --lock-path=/var/run/nginx.lock \
+    --http-client-body-temp-path=/var/cache/nginx/client_temp \
+    --http-proxy-temp-path=/var/cache/nginx/proxy_temp \
+    --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
+    --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp \
+    --http-scgi-temp-path=/var/cache/nginx/scgi_temp \
+    --user=www-data \
+    --group=www-data \
+    --with-http_ssl_module \
+    --with-http_realip_module \
+    --with-http_addition_module \
+    --with-http_sub_module \
+    --with-http_mp4_module \
+    --with-http_gunzip_module \
+    --with-http_gzip_static_module \
+    --with-http_random_index_module \
+    --with-http_secure_link_module \
+    --with-http_stub_status_module \
+    --with-http_auth_request_module \
+    --with-file-aio \
+    --with-ipv6 \
+    --with-threads \
+    --with-stream \
+    --with-stream_ssl_module \
+    --with-http_v2_module && \
+  make && \
+  make install && \
+  adduser -D www-data && \
+  rm -rf /tmp/* && \
+  apk del ${BUILD_PKGS} && \
+  rm -rf /var/cache/apk/*
 
 # Forward request and error logs to docker log collector
-RUN ln -sf /dev/stdout /var/log/nginx/access.log
-RUN ln -sf /dev/stderr /var/log/nginx/error.log
+RUN ln -sf /proc/self/fd/1 /var/log/nginx/access.log && \
+    ln -sf /proc/self/fd/2 /var/log/nginx/error.log # stderr
 
-ENV CONFIGURATION_VERSION=1.1.0
-
-# Update the configuration
-RUN rm -rf /etc/nginx
+# Update the configuration to version 1.1
 ADD etc/nginx /etc/nginx 
 
 # Bind to the host file system for better performance. See https://github.com/nginxinc/docker-nginx/issues/19
 VOLUME ["/var/cache/nginx"]
 
-VOLUME ["/etc/ssl/", "/etc/nginx/conf.d/"]
-
-EXPOSE 80 443
-
 CMD ["nginx", "-g", "daemon off;"]
+
