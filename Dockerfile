@@ -8,11 +8,11 @@
 # - Some NGINX modules aren't compiled (mail, mail-ssl, dav, flv)
 # - It's not running on alpine-kubernetes 
 
-FROM alpine:3.3
+FROM alpine:edge
 MAINTAINER littleman.co <support@littleman.co> 
 
 RUN \
-  NGINX_VERSION="1.9.10" && \
+  NGINX_VERSION="1.9.12" && \
   BUILD_PKGS="build-base linux-headers openssl-dev pcre-dev wget zlib-dev" && \
   RUNTIME_PKGS="ca-certificates openssl pcre zlib" && \
   apk --update add ${BUILD_PKGS} ${RUNTIME_PKGS} && \
@@ -67,7 +67,7 @@ RUN ln -sf /proc/self/fd/1 /var/log/nginx/access.log && \
 ADD etc/nginx /etc/nginx 
 
 # Bind to the host file system for better performance. See https://github.com/nginxinc/docker-nginx/issues/19
-VOLUME ["/var/cache/nginx"]
+VOLUME ["/var/cache/nginx", "/etc/ssl/"]
 
 CMD ["nginx", "-g", "daemon off;"]
 
