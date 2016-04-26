@@ -12,7 +12,7 @@ FROM alpine:edge
 MAINTAINER littleman.co <support@littleman.co> 
 
 RUN \
-  NGINX_VERSION="1.9.12" && \
+  NGINX_VERSION="1.9.15" && \
   BUILD_PKGS="build-base linux-headers openssl-dev pcre-dev wget zlib-dev" && \
   RUNTIME_PKGS="ca-certificates openssl pcre zlib" && \
   apk --update add ${BUILD_PKGS} ${RUNTIME_PKGS} && \
