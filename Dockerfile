@@ -11,6 +11,8 @@
 FROM alpine:edge
 MAINTAINER littleman.co <support@littleman.co> 
 
+# The docker build process does not pick up changes 
+ENV ITERATION 3
 RUN \
   NGINX_VERSION="1.9.15" && \
   BUILD_PKGS="build-base linux-headers openssl-dev pcre-dev wget zlib-dev" && \
