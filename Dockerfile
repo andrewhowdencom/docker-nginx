@@ -67,7 +67,7 @@ RUN ln -sf /proc/self/fd/1 /var/log/nginx/access.log && \
 ADD etc/nginx /etc/nginx 
 
 # Bind to the host file system for better performance. See https://github.com/nginxinc/docker-nginx/issues/19
-VOLUME ["/var/cache/nginx", "/etc/ssl/"]
+VOLUME ["/var/cache/nginx", "/etc/ssl/", "/etc/nginx/sites-enabled", "/etc/nginx/conf.d/"]
 
 CMD ["nginx", "-g", "daemon off;"]
 
