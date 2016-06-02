@@ -14,7 +14,7 @@ MAINTAINER littleman.co <support@littleman.co>
 # The docker build process does not pick up changes 
 ENV ITERATION 3
 RUN \
-  NGINX_VERSION="1.9.15" && \
+  NGINX_VERSION="1.11.1" && \
   BUILD_PKGS="build-base linux-headers openssl-dev pcre-dev wget zlib-dev" && \
   RUNTIME_PKGS="ca-certificates openssl pcre zlib" && \
   apk --update add ${BUILD_PKGS} ${RUNTIME_PKGS} && \
