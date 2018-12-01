@@ -11,18 +11,51 @@
 FROM alpine:edge
 MAINTAINER littleman.co <support@littleman.co> 
 
+# See
+#   https://github.com/proemergotech/nginx-rtmp-opentracing/blob/369a0536bdd076a70b721fed5287a5a2257d21a1/Dockerfile
+ENV NGINX_OPENTRACING_MODULE_VERSION 0.7.0
+ENV OPENTRACING_VERSION 1.5.0
+ENV JAEGER_VERSION 0.4.2
+
+ENV NGINX_OPENTRACING_MODULE nginx-opentracing-${NGINX_OPENTRACING_MODULE_VERSION}
+ENV OPENTRACING opentracing-cpp-${OPENTRACING_VERSION}
+ENV JAEGER jaeger-client-cpp-${JAEGER_VERSION}
+
 # The docker build process does not pick up changes 
 ENV ITERATION 3
 RUN \
-  NGINX_VERSION="1.11.1" && \
-  BUILD_PKGS="build-base linux-headers openssl-dev pcre-dev wget zlib-dev" && \
-  RUNTIME_PKGS="ca-certificates openssl pcre zlib" && \
+  NGINX_VERSION="1.15.7" && \
+  BUILD_PKGS="build-base linux-headers openssl-dev pcre-dev wget zlib-dev cmake" && \
+  RUNTIME_PKGS="ca-certificates openssl pcre zlib yaml-cpp" && \
   apk --update add ${BUILD_PKGS} ${RUNTIME_PKGS} && \
   cd /tmp && \
+  ##
+  ## -- Build Opentracing cpp lib
+  ##
+  wget https://github.com/opentracing/opentracing-cpp/archive/v${OPENTRACING_VERSION}.tar.gz -O ${OPENTRACING}.tar.gz && \
+  tar zxf ${OPENTRACING}.tar.gz && \
+  cd ${OPENTRACING} && \
+  mkdir .build && cd .build && \
+  cmake -DCMAKE_BUILD_TYPE=Release \
+           -DBUILD_TESTING=OFF .. && \
+  make && make install && \
+  ## 
+  ## -- Get nginx-opentracing.
+  ## 
+  cd /tmp && \
+  wget https://github.com/opentracing-contrib/nginx-opentracing/archive/v${NGINX_OPENTRACING_MODULE_VERSION}.tar.gz -O ${NGINX_OPENTRACING_MODULE}.tar.gz && \
+  tar zxf ${NGINX_OPENTRACING_MODULE}.tar.gz && \
+  ##
+  ## -- Build NGINX
+  ## 
+  cd /tmp/ && \
   wget http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz && \
   tar xzf nginx-${NGINX_VERSION}.tar.gz && \
   cd /tmp/nginx-${NGINX_VERSION} && \
   ./configure \
+    ## Open Tracing
+    --add-dynamic-module=/tmp/${NGINX_OPENTRACING_MODULE}/opentracing \
+    ## Nginx Defaults
     --prefix=/etc/nginx \
     --sbin-path=/usr/sbin/nginx \
     --conf-path=/etc/nginx/nginx.conf \
